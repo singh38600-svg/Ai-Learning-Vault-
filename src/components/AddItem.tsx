@@ -99,11 +99,6 @@ export default function AddItem({ userId, profile, onAnalysisSuccess }: AddItemP
     }, 2800);
 
     try {
-      // Gather active AI Settings keys
-      const provs = await dbService.getAIProviderSettings(userId);
-      const activeProv = provs.find(x => x.is_default) || provs[0];
-      const customKey = activeProv?.encrypted_api_key?.includes('•') ? '' : activeProv?.encrypted_api_key;
-
       const response = await fetch('/api/ai/analyse-transcript', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -116,10 +111,7 @@ export default function AddItem({ userId, profile, onAnalysisSuccess }: AddItemP
           personal_notes: personalNotes,
           user_experience_level: profile.experience_level,
           user_learning_goals: profile.learning_goals,
-          user_interests: profile.interests,
-          customProvider: activeProv?.provider,
-          customKey: customKey || '',
-          customModel: activeProv?.selected_model || ''
+          user_interests: profile.interests
         })
       });
 

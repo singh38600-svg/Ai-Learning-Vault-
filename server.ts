@@ -19,10 +19,10 @@ const PORT = 3000;
 app.use(express.json({ limit: '10mb' }));
 
 // Utility to get the appropriate Gemini API client
-function getGeminiClient(customKey?: string) {
-  const apiKey = customKey || process.env.GEMINI_API_KEY;
+function getGeminiClient() {
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    throw new Error('No API Key configured. Please add a GEMINI_API_KEY to your workspace secrets or provide a custom key.');
+    throw new Error('No API Key configured. Please add a GEMINI_API_KEY to your workspace secrets.');
   }
   return new GoogleGenAI({
     apiKey: apiKey,
@@ -32,53 +32,6 @@ function getGeminiClient(customKey?: string) {
       },
     },
   });
-}
-
-// Custom fetch helper for third-party providers (Groq & OpenRouter)
-async function callOpenAICompatibleProvider(
-  url: string,
-  key: string,
-  model: string,
-  systemInstruction: string,
-  userPrompt: string,
-  jsonMode = false
-) {
-  try {
-    const headers: Record<string, string> = {
-      'Authorization': `Bearer ${key}`,
-      'Content-Type': 'application/json',
-    };
-    if (url.includes('openrouter')) {
-      headers['HTTP-Referer'] = 'https://ai.studio/build';
-      headers['X-Title'] = 'AI Learning Vault';
-    }
-
-    const body = {
-      model: model,
-      messages: [
-        { role: 'system', content: systemInstruction },
-        { role: 'user', content: userPrompt }
-      ],
-      temperature: 0.2,
-      response_format: jsonMode ? { type: 'json_object' } : undefined
-    };
-
-    const response = await fetch(url, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(body)
-    });
-
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`Provider returned error (${response.status}): ${errText}`);
-    }
-
-    const data = await response.json();
-    return data.choices?.[0]?.message?.content || '';
-  } catch (error: any) {
-    throw new Error(`Failed to contact API provider: ${error.message}`);
-  }
 }
 
 // Helper to parse JSON from AI outputs safely
@@ -102,60 +55,7 @@ function parseAIJson(text: string) {
 
 // Test Provider Connection
 app.post('/api/ai/test-connection', async (req: express.Request, res: express.Response): Promise<void> => {
-  const { provider, apiKey, model } = req.body;
-  if (!apiKey) {
-    res.status(400).json({ error: 'API key is required to test connection.' });
-    return;
-  }
-
-  try {
-    if (provider === 'Google Gemini') {
-      const ai = getGeminiClient(apiKey);
-      const testModel = model || 'gemini-3.5-flash';
-      const response = await ai.models.generateContent({
-        model: testModel,
-        contents: 'Respond with exactly one word: "OK"',
-      });
-      const result = response.text?.trim() || '';
-      if (result.toUpperCase().includes('OK')) {
-        res.json({ success: true, message: 'Connection successful!' });
-      } else {
-        res.json({ success: false, message: `Unexpected response: ${result}` });
-      }
-    } else if (provider === 'Groq') {
-      const testModel = model || 'llama-3.3-70b-versatile';
-      const result = await callOpenAICompatibleProvider(
-        'https://api.groq.com/openai/v1/chat/completions',
-        apiKey,
-        testModel,
-        'You are a testing utility.',
-        'Respond with exactly one word: "OK"'
-      );
-      if (result.toUpperCase().includes('OK')) {
-        res.json({ success: true, message: 'Connection successful!' });
-      } else {
-        res.json({ success: false, message: `Unexpected response: ${result}` });
-      }
-    } else if (provider === 'OpenRouter') {
-      const testModel = model || 'meta-llama/llama-3.3-70b-instruct:free';
-      const result = await callOpenAICompatibleProvider(
-        'https://openrouter.ai/api/v1/chat/completions',
-        apiKey,
-        testModel,
-        'You are a testing utility.',
-        'Respond with exactly one word: "OK"'
-      );
-      if (result.toUpperCase().includes('OK')) {
-        res.json({ success: true, message: 'Connection successful!' });
-      } else {
-        res.json({ success: false, message: `Unexpected response: ${result}` });
-      }
-    } else {
-      res.status(400).json({ error: `Unsupported provider: ${provider}` });
-    }
-  } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Connection test failed.' });
-  }
+  res.json({ success: false, message: 'Custom AI providers are coming later. This personal MVP currently uses the securely configured workspace Gemini key.' });
 });
 
 // Analyze Content Transcript
@@ -169,10 +69,7 @@ app.post('/api/ai/analyse-transcript', async (req: express.Request, res: express
     personal_notes,
     user_experience_level,
     user_learning_goals,
-    user_interests,
-    customProvider,
-    customKey,
-    customModel
+    user_interests
   } = req.body;
 
   if (!transcript || transcript.trim() === '') {
@@ -241,38 +138,19 @@ Personal Notes: ${personal_notes || 'None'}`;
   try {
     let aiResponseText = '';
 
-    if (customProvider && customProvider !== 'Google Gemini' && customKey) {
-      // Third-party provider
-      const apiUrl = customProvider === 'Groq'
-        ? 'https://api.groq.com/openai/v1/chat/completions'
-        : 'https://openrouter.ai/api/v1/chat/completions';
-      const fallbackModel = customProvider === 'Groq'
-        ? 'llama-3.3-70b-versatile'
-        : 'meta-llama/llama-3.3-70b-instruct:free';
-      
-      aiResponseText = await callOpenAICompatibleProvider(
-        apiUrl,
-        customKey,
-        customModel || fallbackModel,
+    // Google Gemini (Default workspace key)
+    const ai = getGeminiClient();
+    const selectedModel = 'gemini-3.5-flash';
+    const response = await ai.models.generateContent({
+      model: selectedModel,
+      contents: userPrompt,
+      config: {
         systemInstruction,
-        userPrompt,
-        true
-      );
-    } else {
-      // Google Gemini (Default or custom key)
-      const ai = getGeminiClient(customKey);
-      const selectedModel = customModel || 'gemini-3.5-flash';
-      const response = await ai.models.generateContent({
-        model: selectedModel,
-        contents: userPrompt,
-        config: {
-          systemInstruction,
-          responseMimeType: 'application/json',
-          temperature: 0.2
-        }
-      });
-      aiResponseText = response.text || '';
-    }
+        responseMimeType: 'application/json',
+        temperature: 0.2
+      }
+    });
+    aiResponseText = response.text || '';
 
     const structuredData = parseAIJson(aiResponseText);
     res.json(structuredData);
@@ -284,7 +162,7 @@ Personal Notes: ${personal_notes || 'None'}`;
 
 // Explain a Detail Section Like I Am 5 (ELI5 rewrite)
 app.post('/api/ai/explain-section', async (req: express.Request, res: express.Response): Promise<void> => {
-  const { section_title, section_content, explanation_style, customKey } = req.body;
+  const { section_title, section_content, explanation_style } = req.body;
   if (!section_content) {
     res.status(400).json({ error: 'Section content is required.' });
     return;
@@ -300,7 +178,7 @@ Content to simplify:
 "${section_content}"`;
 
   try {
-    const ai = getGeminiClient(customKey);
+    const ai = getGeminiClient();
     const response = await ai.models.generateContent({
       model: 'gemini-3.5-flash',
       contents: userPrompt,
@@ -314,7 +192,7 @@ Content to simplify:
 
 // Generate a Micro-Experiment
 app.post('/api/ai/generate-experiment', async (req: express.Request, res: express.Response): Promise<void> => {
-  const { title, tool_name, main_topic, simple_explanation, important_steps, required_tools, customKey } = req.body;
+  const { title, tool_name, main_topic, simple_explanation, important_steps, required_tools } = req.body;
 
   const systemInstruction = `You are a practical learning AI assistant. Your goal is to design a small, hyper-focused, safe micro-experiment based on a tool or technique.
 The experiment MUST be achievable in under 15 minutes, require NO coding, and focus on testing one narrow claim in a free sandbox.
@@ -345,7 +223,7 @@ Steps: ${JSON.stringify(important_steps)}
 Required tools: ${JSON.stringify(required_tools)}`;
 
   try {
-    const ai = getGeminiClient(customKey);
+    const ai = getGeminiClient();
     const response = await ai.models.generateContent({
       model: 'gemini-3.5-flash',
       contents: userPrompt,
@@ -364,7 +242,7 @@ Required tools: ${JSON.stringify(required_tools)}`;
 
 // Generate Product Idea
 app.post('/api/ai/generate-product-idea', async (req: express.Request, res: express.Response): Promise<void> => {
-  const { items, customKey } = req.body;
+  const { items } = req.body;
   if (!items || items.length === 0) {
     res.status(400).json({ error: 'Please select at least one knowledge item.' });
     return;
@@ -402,7 +280,7 @@ Problem: ${it.problem_solved}
 Use cases: ${JSON.stringify(it.possible_use_cases)}`).join('\n\n')}`;
 
   try {
-    const ai = getGeminiClient(customKey);
+    const ai = getGeminiClient();
     const response = await ai.models.generateContent({
       model: 'gemini-3.5-flash',
       contents: userPrompt,
@@ -421,7 +299,7 @@ Use cases: ${JSON.stringify(it.possible_use_cases)}`).join('\n\n')}`;
 
 // Generate Content Draft
 app.post('/api/ai/generate-content-draft', async (req: express.Request, res: express.Response): Promise<void> => {
-  const { title, tool_name, main_claims, experiment, content_type, customKey } = req.body;
+  const { title, tool_name, main_claims, experiment, content_type } = req.body;
 
   const systemInstruction = `You are an educational content creator.
 Your goal is to write a highly engaging social media post (or draft script) that explains a tool.
@@ -439,7 +317,7 @@ Original claims: ${JSON.stringify(main_claims)}
 Experiment tested: ${JSON.stringify(experiment)}`;
 
   try {
-    const ai = getGeminiClient(customKey);
+    const ai = getGeminiClient();
     const response = await ai.models.generateContent({
       model: 'gemini-3.5-flash',
       contents: userPrompt,
@@ -453,7 +331,7 @@ Experiment tested: ${JSON.stringify(experiment)}`;
 
 // Generate Weekly Review
 app.post('/api/ai/generate-weekly-review', async (req: express.Request, res: express.Response): Promise<void> => {
-  const { stats, onboarding, customKey } = req.body;
+  const { stats, onboarding } = req.body;
 
   const systemInstruction = `You are a supportive learning coach.
 Analyze the user's weekly learning stats and provide a friendly report.
@@ -495,7 +373,7 @@ User's onboarding profile:
 - Interests: ${JSON.stringify(onboarding.interests || [])}`;
 
   try {
-    const ai = getGeminiClient(customKey);
+    const ai = getGeminiClient();
     const response = await ai.models.generateContent({
       model: 'gemini-3.5-flash',
       contents: userPrompt,

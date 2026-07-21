@@ -6,7 +6,6 @@
 import { supabase, isSupabaseConfigured } from './supabase';
 import {
   Profile,
-  AIProviderSetting,
   KnowledgeItem,
   KnowledgeItemRelation,
   Experiment,
@@ -20,7 +19,6 @@ import {
 const KEYS = {
   CURRENT_USER: 'ailv_current_user',
   PROFILE: 'ailv_profile',
-  AI_PROVIDERS: 'ailv_ai_providers',
   KNOWLEDGE_ITEMS: 'ailv_knowledge_items',
   KNOWLEDGE_RELATIONS: 'ailv_knowledge_relations',
   EXPERIMENTS: 'ailv_experiments',
@@ -49,31 +47,6 @@ const SEED_PROFILE: Profile = {
   created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
   updated_at: new Date().toISOString(),
 };
-
-const SEED_PROVIDERS: AIProviderSetting[] = [
-  {
-    id: 'prov-1',
-    user_id: SEED_USER_ID,
-    provider: 'Google Gemini',
-    encrypted_api_key: '••••••••••••••••',
-    selected_model: 'gemini-3.5-flash',
-    is_default: true,
-    connection_status: 'Working',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 'prov-2',
-    user_id: SEED_USER_ID,
-    provider: 'Groq',
-    encrypted_api_key: '',
-    selected_model: 'llama-3.3-70b-versatile',
-    is_default: false,
-    connection_status: 'Not Tested',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  }
-];
 
 const SEED_KNOWLEDGE_ITEMS: KnowledgeItem[] = [
   {
@@ -643,10 +616,6 @@ class DatabaseService {
     if (!localStorage.getItem(KEYS.PROFILE)) {
       localStorage.setItem(KEYS.PROFILE, JSON.stringify(SEED_PROFILE));
     }
-    // AI Providers
-    if (!localStorage.getItem(KEYS.AI_PROVIDERS)) {
-      localStorage.setItem(KEYS.AI_PROVIDERS, JSON.stringify(SEED_PROVIDERS));
-    }
     // Knowledge items
     if (!localStorage.getItem(KEYS.KNOWLEDGE_ITEMS)) {
       localStorage.setItem(KEYS.KNOWLEDGE_ITEMS, JSON.stringify(SEED_KNOWLEDGE_ITEMS));
@@ -748,93 +717,6 @@ class DatabaseService {
       .single();
     if (error) throw error;
     return data;
-  }
-
-  // --- AI Provider Settings ---
-  async getAIProviderSettings(userId: string): Promise<AIProviderSetting[]> {
-    if (this.isLocal) {
-      const data = localStorage.getItem(KEYS.AI_PROVIDERS);
-      return data ? JSON.parse(data) : [];
-    }
-    const { data, error } = await supabase!
-      .from('ai_provider_settings')
-      .select('*')
-      .eq('user_id', userId);
-    if (error) {
-      console.error('Error fetching AI providers:', error);
-      return [];
-    }
-    return data || [];
-  }
-
-  async saveAIProviderSetting(setting: Omit<AIProviderSetting, 'id' | 'created_at' | 'updated_at'> & { id?: string }): Promise<AIProviderSetting> {
-    if (this.isLocal) {
-      const list = await this.getAIProviderSettings(setting.user_id);
-      let updatedSetting: AIProviderSetting;
-
-      if (setting.id) {
-        // Edit
-        list[list.findIndex(x => x.id === setting.id)] = {
-          ...list.find(x => x.id === setting.id),
-          ...setting,
-          updated_at: new Date().toISOString()
-        } as AIProviderSetting;
-        updatedSetting = list.find(x => x.id === setting.id)!;
-      } else {
-        // Create new
-        updatedSetting = {
-          ...setting,
-          id: 'prov-' + Math.random().toString(36).substr(2, 9),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        } as AIProviderSetting;
-        list.push(updatedSetting);
-      }
-
-      // If this setting is set to default, unset others
-      if (setting.is_default) {
-        list.forEach(x => {
-          if (x.id !== updatedSetting.id) x.is_default = false;
-        });
-      }
-
-      localStorage.setItem(KEYS.AI_PROVIDERS, JSON.stringify(list));
-      return updatedSetting;
-    }
-
-    // In connected Mode:
-    if (setting.is_default) {
-      // Unset all other default providers
-      await supabase!
-        .from('ai_provider_settings')
-        .update({ is_default: false })
-        .eq('user_id', setting.user_id);
-    }
-
-    const { data, error } = await supabase!
-      .from('ai_provider_settings')
-      .upsert({
-        ...setting,
-        updated_at: new Date().toISOString()
-      })
-      .select()
-      .single();
-    if (error) throw error;
-    return data;
-  }
-
-  async deleteAIProviderSetting(id: string, userId: string): Promise<void> {
-    if (this.isLocal) {
-      const list = await this.getAIProviderSettings(userId);
-      const filtered = list.filter(x => x.id !== id);
-      localStorage.setItem(KEYS.AI_PROVIDERS, JSON.stringify(filtered));
-      return;
-    }
-    const { error } = await supabase!
-      .from('ai_provider_settings')
-      .delete()
-      .eq('id', id);
-    if (error) throw error;
   }
 
   // --- Knowledge Items ---

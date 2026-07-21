@@ -250,7 +250,7 @@ export default function AddItem({ userId, profile, onAnalysisSuccess }: AddItemP
                     value={originalLink}
                     onChange={(e) => setOriginalLink(e.target.value)}
                     placeholder="https://instagram.com/..."
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-slate-400 focus:bg-white transition-all font-medium"
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-base md:text-xs focus:outline-none focus:border-slate-400 focus:bg-white transition-all font-medium"
                   />
                 </div>
               </div>
@@ -261,7 +261,7 @@ export default function AddItem({ userId, profile, onAnalysisSuccess }: AddItemP
                   <select
                     value={contentType}
                     onChange={(e) => setContentType(e.target.value)}
-                    className="px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-slate-400 focus:bg-white transition-all font-semibold"
+                    className="px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-base md:text-xs focus:outline-none focus:border-slate-400 focus:bg-white transition-all font-semibold"
                   >
                     {contentTypes.map(t => <option key={t} value={t}>{t}</option>)}
                   </select>
@@ -270,7 +270,7 @@ export default function AddItem({ userId, profile, onAnalysisSuccess }: AddItemP
                     value={platform}
                     onChange={(e) => setPlatform(e.target.value)}
                     placeholder="Platform (e.g. YouTube)"
-                    className="px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-slate-400 focus:bg-white transition-all font-semibold"
+                    className="px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-base md:text-xs focus:outline-none focus:border-slate-400 focus:bg-white transition-all font-semibold"
                   />
                 </div>
               </div>
@@ -287,7 +287,7 @@ export default function AddItem({ userId, profile, onAnalysisSuccess }: AddItemP
                     value={creatorName}
                     onChange={(e) => setCreatorName(e.target.value)}
                     placeholder="e.g. AITrendsetter"
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-slate-400 focus:bg-white transition-all font-medium"
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-base md:text-xs focus:outline-none focus:border-slate-400 focus:bg-white transition-all font-medium"
                   />
                 </div>
               </div>
@@ -297,7 +297,7 @@ export default function AddItem({ userId, profile, onAnalysisSuccess }: AddItemP
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-slate-400 focus:bg-white transition-all font-semibold"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-base md:text-xs focus:outline-none focus:border-slate-400 focus:bg-white transition-all font-semibold"
                 >
                   {categories.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
@@ -317,7 +317,7 @@ export default function AddItem({ userId, profile, onAnalysisSuccess }: AddItemP
                   onChange={(e) => setTranscript(e.target.value)}
                   placeholder="Paste the copied transcription text of the AI reel or video here..."
                   rows={6}
-                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs focus:outline-none focus:border-slate-400 focus:bg-white transition-all leading-relaxed font-medium"
+                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-base md:text-xs focus:outline-none focus:border-slate-400 focus:bg-white transition-all leading-relaxed font-medium"
                   required
                 />
               </div>
@@ -333,7 +333,7 @@ export default function AddItem({ userId, profile, onAnalysisSuccess }: AddItemP
                   onChange={(e) => setPersonalNotes(e.target.value)}
                   placeholder="e.g. Write why you saved this or what specific local business you think this can help."
                   rows={2}
-                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs focus:outline-none focus:border-slate-400 focus:bg-white transition-all leading-relaxed font-medium"
+                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-base md:text-xs focus:outline-none focus:border-slate-400 focus:bg-white transition-all leading-relaxed font-medium"
                 />
               </div>
             </div>

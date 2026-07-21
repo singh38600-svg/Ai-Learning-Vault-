@@ -93,7 +93,7 @@ export default function ExperimentLog({ userId, setActiveTab }: ExperimentLogPro
       const updated: Experiment = {
         ...exp,
         status: decision === 'Dropped' ? 'Dropped' : 'Completed',
-        notes: findingNotes.trim() || 'Completed no-code sandbox test.',
+        notes: findingNotes.trim() || 'Completed small safe test.',
         final_decision: decision,
         media_proof: mockAttachment || exp.media_proof
       };
@@ -159,7 +159,10 @@ export default function ExperimentLog({ userId, setActiveTab }: ExperimentLogPro
           </div>
           <h2 className="text-lg font-bold text-slate-900 font-sans">Try Next is Empty</h2>
           <p className="text-slate-500 text-sm leading-relaxed font-semibold">
-            There are no sandbox tests or action plans setup yet. Save a lesson first to formulate a small test experiment!
+            There are no small safe tests or action plans set up yet. Save a lesson first to plan a small test!
+          </p>
+          <p className="text-slate-500 text-sm leading-relaxed font-semibold">
+            “A test is one small action that helps you check whether an idea really works.”
           </p>
           <button
             onClick={() => setActiveTab('add')}
@@ -177,7 +180,10 @@ export default function ExperimentLog({ userId, setActiveTab }: ExperimentLogPro
           </div>
           <h2 className="text-lg font-bold text-slate-900 font-sans">No Tests Started Yet</h2>
           <p className="text-slate-500 text-sm leading-relaxed font-semibold">
-            You have saved lessons but haven't planned any sandbox tests yet. Go to Saved Lessons, select a lesson, and plan a simple test!
+            You have saved lessons but haven't planned any small safe tests yet. Go to Saved Lessons, select a lesson, and plan a simple test!
+          </p>
+          <p className="text-slate-500 text-sm leading-relaxed font-semibold">
+            “A test is one small action that helps you check whether an idea really works.”
           </p>
           <button
             onClick={() => setActiveTab('library')}
@@ -200,7 +206,7 @@ export default function ExperimentLog({ userId, setActiveTab }: ExperimentLogPro
           <span>Try Next</span>
         </h2>
         <p className="text-slate-500 text-sm mt-1 leading-relaxed">
-          Test tools in a safe, free no-code sandbox instead of just collecting bookmarks. Keep tests under 15 minutes!
+          Test tools in a safe, free way instead of just collecting bookmarks. Keep tests under 15 minutes! “A test is one small action that helps you check whether an idea really works.”
         </p>
       </div>
 
@@ -209,7 +215,7 @@ export default function ExperimentLog({ userId, setActiveTab }: ExperimentLogPro
         <div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-start gap-3 text-rose-800 text-xs">
           <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
           <div>
-            <h4 className="font-bold">Strict Focus Protection Active</h4>
+            <h4 className="font-bold">Strict Focus Limit Active</h4>
             <p className="mt-0.5 leading-relaxed font-medium">{focusError}</p>
             <button
               onClick={() => setFocusError(null)}
@@ -326,7 +332,7 @@ export default function ExperimentLog({ userId, setActiveTab }: ExperimentLogPro
                               onChange={(e) => setFindingNotes(e.target.value)}
                               placeholder="e.g. Chatbot responded in 1 second. Voice sounds super realistic, but Twilio number setup cost $1."
                               rows={3}
-                              className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-slate-400 transition-all font-medium leading-relaxed resize-none"
+                              className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:outline-none focus:border-slate-400 transition-all font-medium leading-relaxed resize-none"
                             />
                           </div>
 

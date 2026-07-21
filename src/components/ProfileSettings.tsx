@@ -76,10 +76,19 @@ export default function ProfileSettings({ userId, profile, onProfileUpdate }: Pr
     }
   };
 
-  const handleResetDatabase = async () => {
-    if (confirm('⚠️ WARNING: This will delete all of your current custom saves, content drafts, and experiments, and restore the original pre-seeded lessons. Do you want to proceed?')) {
-      localStorage.clear();
-      alert('Database successfully reset to seeded demo files! Reloading applet...');
+  const handleDeleteEverything = async () => {
+    if (confirm('🚨 DANGER: This will delete ALL of your records (lessons, tests, drafts, ideas, weekly reviews, and custom saves), leaving the vault completely empty.\n\nYour profile settings will be preserved.\n\nAre you sure you want to delete everything and start empty?')) {
+      await dbService.clearAllData(userId);
+      alert('The database has been successfully emptied. Starting completely fresh!');
+      window.location.reload();
+    }
+  };
+
+  const handleResetAndLoadDemo = async () => {
+    if (confirm('🔄 This will clear ALL of your current records (including any personal saves or drafts) and load the pre-seeded demo dataset. Every record in the demo will be marked as a demo record.\n\nAre you sure you want to load the demo dataset?')) {
+      await dbService.clearAllData(userId);
+      await dbService.seedSampleData(userId);
+      alert('The database has been successfully reset to the complete demo dataset!');
       window.location.reload();
     }
   };
@@ -119,7 +128,7 @@ export default function ProfileSettings({ userId, profile, onProfileUpdate }: Pr
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-slate-400 focus:bg-white transition-all font-semibold"
+                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-base md:text-xs focus:outline-none focus:border-slate-400 focus:bg-white transition-all font-semibold"
                 required
               />
             </div>
@@ -129,7 +138,7 @@ export default function ProfileSettings({ userId, profile, onProfileUpdate }: Pr
               <select
                 value={experienceLevel}
                 onChange={(e) => setExperienceLevel(e.target.value as any)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:bg-white font-bold"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-base md:text-xs focus:outline-none focus:bg-white font-bold"
               >
                 <option value="Complete beginner">Complete beginner</option>
                 <option value="Beginner">Beginner</option>
@@ -145,7 +154,7 @@ export default function ProfileSettings({ userId, profile, onProfileUpdate }: Pr
               <select
                 value={codingKnowledge}
                 onChange={(e) => setCodingKnowledge(e.target.value as any)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:bg-white font-bold"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-base md:text-xs focus:outline-none focus:bg-white font-bold"
               >
                 <option value="Yes">Yes, I can write code</option>
                 <option value="No">No, I can't write code</option>
@@ -158,7 +167,7 @@ export default function ProfileSettings({ userId, profile, onProfileUpdate }: Pr
               <select
                 value={mainDevice}
                 onChange={(e) => setMainDevice(e.target.value as any)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:bg-white font-bold"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-base md:text-xs focus:outline-none focus:bg-white font-bold"
               >
                 <option value="Phone">Smart Phone only</option>
                 <option value="Computer">Computer / Laptop</option>
@@ -173,7 +182,7 @@ export default function ProfileSettings({ userId, profile, onProfileUpdate }: Pr
               value={learningGoals}
               onChange={(e) => setLearningGoals(e.target.value)}
               rows={2}
-              className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-slate-400 focus:bg-white transition-all font-semibold resize-none"
+              className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-base md:text-xs focus:outline-none focus:border-slate-400 focus:bg-white transition-all font-semibold resize-none"
             />
           </div>
 
@@ -214,23 +223,23 @@ export default function ProfileSettings({ userId, profile, onProfileUpdate }: Pr
         {/* Database reset block */}
         <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
           <div className="space-y-3">
-            <span className="text-[9px] font-bold text-slate-400 font-mono uppercase tracking-widest block">System Diagnostics</span>
+            <span className="text-[10px] font-bold text-slate-400 font-mono uppercase tracking-widest block">System Diagnostics</span>
             
             <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-              <h5 className="text-[11px] font-bold text-slate-800 flex items-center gap-1">
+              <h5 className="text-xs font-bold text-slate-800 flex items-center gap-1">
                 🧹 Clear Demo Data
               </h5>
-              <p className="text-[10px] text-slate-500 font-semibold leading-relaxed">
+              <p className="text-sm text-slate-500 leading-relaxed font-semibold">
                 Removes all pre-seeded sample/demo lessons and test experiments from your lists, leaving only your personal saves.
               </p>
             </div>
 
             <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl space-y-1">
-              <h5 className="text-[11px] font-bold text-rose-800 flex items-center gap-1">
-                <RotateCcw className="w-3.5 h-3.5 text-rose-600" /> Factory Reset
+              <h5 className="text-xs font-bold text-rose-800 flex items-center gap-1">
+                <RotateCcw className="w-3.5 h-3.5 text-rose-600" /> Reset Database Options
               </h5>
-              <p className="text-[10px] text-rose-600 font-semibold leading-relaxed">
-                Clears all data from local storage, deletes all custom records, and restores the original pre-seeded lessons.
+              <p className="text-sm text-rose-600 leading-relaxed font-semibold">
+                Start completely empty or reload the full marked demo dataset at any time.
               </p>
             </div>
           </div>
@@ -245,12 +254,21 @@ export default function ProfileSettings({ userId, profile, onProfileUpdate }: Pr
             </button>
 
             <button
-              onClick={handleResetDatabase}
+              onClick={handleDeleteEverything}
+              type="button"
+              className="w-full py-2.5 border border-slate-200 hover:bg-slate-50 text-slate-700 hover:text-slate-950 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1.5 min-h-[44px]"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Delete Everything & Start Empty</span>
+            </button>
+
+            <button
+              onClick={handleResetAndLoadDemo}
               type="button"
               className="w-full py-2.5 border border-rose-200 hover:bg-rose-50 hover:text-rose-700 rounded-xl text-xs font-bold text-rose-600 transition-colors flex items-center justify-center gap-1.5 min-h-[44px]"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              <span>Factory Reset Database</span>
+              <span>Reset & Load Demo Dataset</span>
             </button>
           </div>
         </div>

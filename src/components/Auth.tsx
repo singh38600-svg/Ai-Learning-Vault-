@@ -61,7 +61,7 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
   const handleDemoLogin = async () => {
     setLoading(true);
     try {
-      const res = await dbService.login('rohitsinghpanwar637@gmail.com');
+      const res = await dbService.login('demo@example.com');
       if (res.data?.user) {
         onAuthSuccess(res.data.user);
       }
@@ -124,7 +124,7 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-slate-400 focus:bg-white transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-base md:text-sm focus:outline-none focus:border-slate-400 focus:bg-white transition-all"
                   required
                 />
               </div>
@@ -139,7 +139,7 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-slate-400 focus:bg-white transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-base md:text-sm focus:outline-none focus:border-slate-400 focus:bg-white transition-all"
                   required
                 />
               </div>

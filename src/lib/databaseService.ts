@@ -33,7 +33,7 @@ const SEED_USER_ID = 'demo-user-id';
 
 const SEED_PROFILE: Profile = {
   id: SEED_USER_ID,
-  email: 'rohitsinghpanwar637@gmail.com',
+  email: 'demo@example.com',
   full_name: 'Demo Learner',
   learning_goals: 'Master AI automation and build simple productivity assistants without deep coding.',
   experience_level: 'Beginner',
@@ -132,7 +132,7 @@ const SEED_KNOWLEDGE_ITEMS: KnowledgeItem[] = [
     main_claims: ['Zero-code setup', 'Managed on a smartphone', '100% free account'],
     important_concepts: ['Hiring Agent', 'No-code API Integration'],
     important_steps: ['Log in to AgentCreator', 'Write agent prompt', 'Authorize calendar'],
-    possible_use_cases: ['Hiring pipeline scheduling'],
+    possible_use_cases: ['Hiring list scheduling'],
     target_user: 'Solopreneurs, small business owners',
     difficulty: 'Easy',
     estimated_time: '5 minutes',
@@ -170,7 +170,7 @@ const SEED_KNOWLEDGE_ITEMS: KnowledgeItem[] = [
       why_it_matters: 'You can have a 24/7 receptionist answering business calls without hiring full-time staff.',
       how_it_works: 'When someone calls, Vapi listens, converts speech to text, gets an AI response, and speaks it back in milliseconds.',
       where_to_use_it: 'Local restaurants, dentists, or support desks.',
-      what_to_do_next: 'Create a free sandbox account on Vapi and do a browser-based test call.'
+      what_to_do_next: 'Create a free test account on Vapi and do a browser-based test call.'
     },
     problem_solved: 'Missing customer phone calls during busy hours or off-duty periods.',
     main_claims: [
@@ -202,7 +202,7 @@ const SEED_KNOWLEDGE_ITEMS: KnowledgeItem[] = [
     relevance_score: 75,
     relevance_reason: 'Useful for building client projects or a high-end service agency business.',
     recommended_decision: 'Save as reference',
-    suggested_action: 'Try Vapi browser sandbox and check voice latency quality.',
+    suggested_action: 'Try Vapi browser test tool and check voice latency quality.',
     status: 'Save as reference',
     created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     updated_at: new Date().toISOString(),
@@ -393,7 +393,7 @@ const SEED_EXPERIMENTS: Experiment[] = [
     knowledge_item_id: 'ki-3',
     title: 'Voice AI receptionist latency check',
     test_question: 'Is Vapi voice response fast enough (<800ms) to feel natural during an active phone call?',
-    objective: 'Build a sandbox receptionist on Vapi, make a live web test call, and assess the conversational rhythm.',
+    objective: 'Build a test receptionist on Vapi, make a live web test call, and assess the conversational rhythm.',
     why_it_matters: 'An AI phone agent is useless if clients hang up due to uncomfortable silences.',
     steps: [
       'Open Vapi and configure default agent persona: "Friendly local pizzeria receptionist".',
@@ -465,7 +465,7 @@ const SEED_EXPERIMENTS: Experiment[] = [
     objective: 'Assess interruption handling on Vapi phone lines.',
     why_it_matters: 'Users will talk over the AI assistant during phone calls.',
     steps: [
-      'Trigger web sandbox call.',
+      'Trigger web test call.',
       'Deliberately interrupt during an active response and observe agent behavior.'
     ],
     estimated_time: '10 minutes',
@@ -522,7 +522,7 @@ It sounded perfect, so I actually built and tested it! Here is what happened:
 
 🟢 What I Actually Did (The Experiment):
 - Created a pizzeria virtual receptionist using Vapi & Twilio.
-- Triggered sample sandbox calls and deliberately tried to interrupt, mumble, and ask complicated menu questions.
+- Triggered sample test calls and deliberately tried to interrupt, mumble, and ask complicated menu questions.
 - Time spent: 20 minutes | Cost spent: $5.
 
 ⚠️ What Actually Happened (The Reality):
@@ -531,7 +531,7 @@ It sounded perfect, so I actually built and tested it! Here is what happened:
 - Configuring the background noise threshold required highly complex settings, far from "zero code".
 
 💡 My Final Verdict:
-The tech is amazing for simple, one-way answering machines (e.g., announcing shop hours). But for rapid, natural booking, your clients will get frustrated. Don't believe everything in viral reels — always test it in a small sandbox first!
+The tech is amazing for simple, one-way answering machines (e.g., announcing shop hours). But for rapid, natural booking, your clients will get frustrated. Don't believe everything in viral reels — always test it in a small safe way first!
 
 #AI #VoiceAI #NoCode #TechReview #AIExperiment`,
     status: 'Draft',
@@ -564,7 +564,7 @@ const SEED_PRODUCT_IDEAS: ProductIdea[] = [
     estimated_cost: 'Low',
     monetization: ['Setup service retainer ($200)', 'Monthly agent maintenance fee ($30/mo)'],
     risks: ['Parsing accuracy of weird PDF columns', 'Candidate privacy rules (GDPR)'],
-    next_action: 'Pitch the booking agent solution to 3 local hiring contacts to secure free sandbox test agreements.',
+    next_action: 'Pitch the booking agent solution to 3 local hiring contacts to secure free pilot test agreements.',
     status: 'Exploring',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
@@ -665,13 +665,42 @@ class DatabaseService {
       updated_at: new Date().toISOString()
     }));
 
+    const demoRelations = SEED_RELATIONS.map(rel => ({
+      ...rel,
+      user_id: userId,
+      is_demo: true
+    }));
+
+    const demoDrafts = SEED_DRAFTS.map(draft => ({
+      ...draft,
+      user_id: userId,
+      is_demo: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }));
+
+    const demoIdeas = SEED_PRODUCT_IDEAS.map(idea => ({
+      ...idea,
+      user_id: userId,
+      is_demo: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }));
+
+    const demoReviews = [SEED_WEEKLY_REVIEW].map(review => ({
+      ...review,
+      user_id: userId,
+      is_demo: true,
+      created_at: new Date().toISOString()
+    }));
+
     if (this.isLocal) {
       localStorage.setItem(KEYS.KNOWLEDGE_ITEMS, JSON.stringify(demoItems));
       localStorage.setItem(KEYS.EXPERIMENTS, JSON.stringify(demoExps));
-      localStorage.setItem(KEYS.WEEKLY_REVIEWS, JSON.stringify([SEED_WEEKLY_REVIEW]));
-      localStorage.setItem(KEYS.PRODUCT_IDEAS, JSON.stringify(SEED_PRODUCT_IDEAS));
-      localStorage.setItem(KEYS.CONTENT_DRAFTS, JSON.stringify(SEED_DRAFTS));
-      localStorage.setItem(KEYS.KNOWLEDGE_RELATIONS, JSON.stringify(SEED_RELATIONS));
+      localStorage.setItem(KEYS.WEEKLY_REVIEWS, JSON.stringify(demoReviews));
+      localStorage.setItem(KEYS.PRODUCT_IDEAS, JSON.stringify(demoIdeas));
+      localStorage.setItem(KEYS.CONTENT_DRAFTS, JSON.stringify(demoDrafts));
+      localStorage.setItem(KEYS.KNOWLEDGE_RELATIONS, JSON.stringify(demoRelations));
     }
   }
 
@@ -687,10 +716,37 @@ class DatabaseService {
       const nonDemoExps = parsedExps.filter((x: any) => !x.is_demo && !x.title?.includes('Demo:'));
       localStorage.setItem(KEYS.EXPERIMENTS, JSON.stringify(nonDemoExps));
 
-      localStorage.setItem(KEYS.WEEKLY_REVIEWS, JSON.stringify([]));
-      localStorage.setItem(KEYS.PRODUCT_IDEAS, JSON.stringify([]));
-      localStorage.setItem(KEYS.CONTENT_DRAFTS, JSON.stringify([]));
+      const relations = localStorage.getItem(KEYS.KNOWLEDGE_RELATIONS);
+      const parsedRelations = relations ? JSON.parse(relations) : [];
+      const nonDemoRelations = parsedRelations.filter((x: any) => !x.is_demo);
+      localStorage.setItem(KEYS.KNOWLEDGE_RELATIONS, JSON.stringify(nonDemoRelations));
+
+      const drafts = localStorage.getItem(KEYS.CONTENT_DRAFTS);
+      const parsedDrafts = drafts ? JSON.parse(drafts) : [];
+      const nonDemoDrafts = parsedDrafts.filter((x: any) => !x.is_demo);
+      localStorage.setItem(KEYS.CONTENT_DRAFTS, JSON.stringify(nonDemoDrafts));
+
+      const ideas = localStorage.getItem(KEYS.PRODUCT_IDEAS);
+      const parsedIdeas = ideas ? JSON.parse(ideas) : [];
+      const nonDemoIdeas = parsedIdeas.filter((x: any) => !x.is_demo);
+      localStorage.setItem(KEYS.PRODUCT_IDEAS, JSON.stringify(nonDemoIdeas));
+
+      const reviews = localStorage.getItem(KEYS.WEEKLY_REVIEWS);
+      const parsedReviews = reviews ? JSON.parse(reviews) : [];
+      const nonDemoReviews = parsedReviews.filter((x: any) => !x.is_demo);
+      localStorage.setItem(KEYS.WEEKLY_REVIEWS, JSON.stringify(nonDemoReviews));
+    }
+  }
+
+  async clearAllData(userId: string): Promise<void> {
+    if (this.isLocal) {
+      localStorage.setItem(KEYS.KNOWLEDGE_ITEMS, JSON.stringify([]));
+      localStorage.setItem(KEYS.EXPERIMENTS, JSON.stringify([]));
       localStorage.setItem(KEYS.KNOWLEDGE_RELATIONS, JSON.stringify([]));
+      localStorage.setItem(KEYS.CONTENT_DRAFTS, JSON.stringify([]));
+      localStorage.setItem(KEYS.PRODUCT_IDEAS, JSON.stringify([]));
+      localStorage.setItem(KEYS.WEEKLY_REVIEWS, JSON.stringify([]));
+      localStorage.setItem(KEYS.ATTACHMENTS, JSON.stringify([]));
     }
   }
 

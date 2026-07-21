@@ -195,7 +195,7 @@ app.post('/api/ai/generate-experiment', async (req: express.Request, res: expres
   const { title, tool_name, main_topic, simple_explanation, important_steps, required_tools } = req.body;
 
   const systemInstruction = `You are a practical learning AI assistant. Your goal is to design a small, hyper-focused, safe micro-experiment based on a tool or technique.
-The experiment MUST be achievable in under 15 minutes, require NO coding, and focus on testing one narrow claim in a free sandbox.
+The experiment MUST be achievable in under 15 minutes, require NO coding, and focus on testing one narrow claim in a free, easy trial environment.
 Avoid vague or heavy instructions. Give specific, bite-sized tasks.
 
 Return a valid, structured JSON object matching this schema EXACTLY:

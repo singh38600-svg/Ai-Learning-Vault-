@@ -257,8 +257,8 @@ export default function Library({
             <LibraryIcon className="w-6 h-6 text-emerald-600" />
             <span>Saved Lessons ({sortedItems.length})</span>
           </h2>
-          <p className="text-slate-500 text-xs mt-1">
-            Access your entire processed repository. Filter, search with natural language, or trigger a side-by-side comparison.
+          <p className="text-slate-500 text-sm mt-1">
+            Access your entire processed saved collection. Filter, search with natural language, or trigger a side-by-side comparison.
           </p>
         </div>
 
@@ -293,7 +293,7 @@ export default function Library({
               value={nlQuery}
               onChange={(e) => setNlQuery(e.target.value)}
               placeholder="e.g. Show me free AI tools for research"
-              className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-emerald-500 transition-all text-slate-200"
+              className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-base md:text-xs focus:outline-none focus:border-emerald-500 transition-all text-slate-200"
             />
             <button
               type="submit"
@@ -323,7 +323,7 @@ export default function Library({
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
                 placeholder="Search keywords, tools, or summaries..."
-                className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-slate-400 focus:bg-white transition-all font-medium"
+                className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-base md:text-xs focus:outline-none focus:border-slate-400 focus:bg-white transition-all font-medium"
               />
             </div>
 
@@ -370,7 +370,7 @@ export default function Library({
               <select
                 value={filterCategory}
                 onChange={(e) => setFilterCategory(e.target.value)}
-                className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] focus:outline-none font-semibold"
+                className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-base md:text-[11px] focus:outline-none font-semibold"
               >
                 <option value="All">All</option>
                 <option value="AI tools">AI tools</option>
@@ -387,7 +387,7 @@ export default function Library({
               <select
                 value={filterDifficulty}
                 onChange={(e) => setFilterDifficulty(e.target.value)}
-                className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] focus:outline-none font-semibold"
+                className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-base md:text-[11px] focus:outline-none font-semibold"
               >
                 <option value="All">All</option>
                 <option value="Easy">Easy</option>
@@ -402,7 +402,7 @@ export default function Library({
               <select
                 value={filterPricing}
                 onChange={(e) => setFilterPricing(e.target.value)}
-                className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] focus:outline-none font-semibold"
+                className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-base md:text-[11px] focus:outline-none font-semibold"
               >
                 <option value="All">All</option>
                 <option value="Free">Free</option>
@@ -417,7 +417,7 @@ export default function Library({
               <select
                 value={filterCoding}
                 onChange={(e) => setFilterCoding(e.target.value)}
-                className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] focus:outline-none font-semibold"
+                className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-base md:text-[11px] focus:outline-none font-semibold"
               >
                 <option value="All">All</option>
                 <option value="Yes">Yes</option>
@@ -431,7 +431,7 @@ export default function Library({
               <select
                 value={filterPhone}
                 onChange={(e) => setFilterPhone(e.target.value)}
-                className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] focus:outline-none font-semibold"
+                className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-base md:text-[11px] focus:outline-none font-semibold"
               >
                 <option value="All">All</option>
                 <option value="Yes">Yes</option>
@@ -445,7 +445,7 @@ export default function Library({
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] focus:outline-none font-semibold"
+                className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-base md:text-[11px] focus:outline-none font-semibold"
               >
                 <option value="All">All</option>
                 <option value="Waiting for review">Inbox (Pending)</option>

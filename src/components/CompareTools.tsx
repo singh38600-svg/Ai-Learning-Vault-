@@ -46,12 +46,12 @@ export default function CompareTools({ items, profile, onBack, setActiveTab }: C
 We highly recommend starting with **${toolA.relevance_score > toolB.relevance_score ? toolA.tool_name : toolB.tool_name}** because it has a significantly higher compatibility score (${Math.max(toolA.relevance_score, toolB.relevance_score)}%) with your goals: "${profile.learning_goals}". 
 
 - If you want a quick, 10-minute free trial without complex setup, use **${toolA.pricing_type === 'Free' ? toolA.tool_name : toolB.tool_name}**.
-- If you are testing from your mobile phone, **${hasPhone ? items.find(x => x.phone_friendly === 'Yes')?.tool_name : 'either'}** is your optimal sandbox choice.`;
+- If you are testing from your mobile phone, **${hasPhone ? items.find(x => x.phone_friendly === 'Yes')?.tool_name : 'either'}** is your optimal choice for a small safe test.`;
       } else {
         const bestItem = [...items].sort((a,b) => b.relevance_score - a.relevance_score)[0];
         recText = `After analyzing these ${items.length} options against your interests in "${profile.interests.join(', ')}", our top pick is **${bestItem.tool_name}**:
 - **Why**: It matches your "${profile.experience_level}" background perfectly and presents the lowest entry barrier for coding requirements (${bestItem.coding_required}).
-- **First Step**: Go to its Steps & Sandbox guidelines tab and launch its generated micro-experiment to test it in under 15 minutes!`;
+- **First Step**: Go to its Steps & Test guidelines tab and launch its generated micro-experiment to test it in under 15 minutes!`;
       }
 
       setRecommendation(recText);

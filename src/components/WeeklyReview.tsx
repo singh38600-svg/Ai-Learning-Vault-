@@ -193,7 +193,7 @@ export default function WeeklyReview({ userId, profile }: WeeklyReviewProps) {
               <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm space-y-3">
                 <span className="text-[9px] font-bold text-indigo-600 font-mono uppercase tracking-widest block">Skills Developed This Week</span>
                 <div className="space-y-2">
-                  {(report.report_data?.skills_developed || ['Applying sandbox criteria', 'Separating marketing hype']).map((skill: string, idx: number) => (
+                  {(report.report_data?.skills_developed || ['Applying small safe test criteria', 'Separating marketing hype']).map((skill: string, idx: number) => (
                     <div key={idx} className="flex gap-2.5 items-start text-[11px] leading-relaxed font-semibold text-slate-600">
                       <Check className="w-4 h-4 text-indigo-500 shrink-0 mt-0.5" />
                       <span>{skill}</span>
@@ -206,7 +206,7 @@ export default function WeeklyReview({ userId, profile }: WeeklyReviewProps) {
               <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm space-y-3">
                 <span className="text-[9px] font-bold text-rose-600 font-mono uppercase tracking-widest block">Knowledge Gaps / Next Goals</span>
                 <div className="space-y-2">
-                  {(report.report_data?.knowledge_gaps || ['Comparing alternative automated pipelines', 'Evaluating Twilio latency limits']).map((gap: string, idx: number) => (
+                  {(report.report_data?.knowledge_gaps || ['Comparing alternative automated lists', 'Evaluating Twilio latency limits']).map((gap: string, idx: number) => (
                     <div key={idx} className="flex gap-2.5 items-start text-[11px] leading-relaxed font-semibold text-slate-600">
                       <TrendingUp className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
                       <span>{gap}</span>

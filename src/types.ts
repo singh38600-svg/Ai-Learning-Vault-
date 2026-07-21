@@ -89,6 +89,7 @@ export interface KnowledgeItemRelation {
   relation_type: 'duplicate' | 'similar' | 'alternative' | 'comparison' | 'prerequisite' | 'follow-up';
   similarity_score: number; // e.g. 0 to 100
   explanation: string;
+  is_demo?: boolean;
   created_at: string;
 }
 
@@ -158,6 +159,7 @@ export interface ContentDraft {
   title: string;
   body: string;
   status: 'Draft' | 'Published';
+  is_demo?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -182,6 +184,7 @@ export interface ProductIdea {
   risks: string[];
   next_action: string;
   status: 'Exploring' | 'Validated' | 'Built' | 'Archived';
+  is_demo?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -205,5 +208,6 @@ export interface WeeklyReview {
     knowledge_gaps: string[];
   };
   recommended_focus: string;
+  is_demo?: boolean;
   created_at: string;
 }

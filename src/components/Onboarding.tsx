@@ -128,7 +128,7 @@ export default function Onboarding({ userId, onOnboardingComplete }: OnboardingP
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder="e.g. Rohini Singh"
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-slate-400 focus:bg-white transition-all"
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-base md:text-sm focus:outline-none focus:border-slate-400 focus:bg-white transition-all"
                     />
                   </div>
 
@@ -337,7 +337,7 @@ export default function Onboarding({ userId, onOnboardingComplete }: OnboardingP
                       onChange={(e) => setLearningGoals(e.target.value)}
                       placeholder="e.g. I want to build simple automation bots to free up 5 hours of manual writing every week."
                       rows={2}
-                      className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-slate-400 focus:bg-white transition-all resize-none"
+                      className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-base md:text-sm focus:outline-none focus:border-slate-400 focus:bg-white transition-all resize-none"
                     />
                   </div>
 
@@ -348,7 +348,7 @@ export default function Onboarding({ userId, onOnboardingComplete }: OnboardingP
                       onChange={(e) => setCurrentProjects(e.target.value)}
                       placeholder="e.g. Building an online resume agency, or automating client booking schedules."
                       rows={2}
-                      className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-slate-400 focus:bg-white transition-all resize-none"
+                      className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-base md:text-sm focus:outline-none focus:border-slate-400 focus:bg-white transition-all resize-none"
                     />
                   </div>
 

@@ -155,7 +155,7 @@ export default function ContentCreator({ userId }: ContentCreatorProps) {
               <select
                 value={selectedItemId}
                 onChange={(e) => setSelectedItemId(e.target.value)}
-                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-slate-400 focus:bg-white transition-all font-semibold"
+                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-base md:text-xs focus:outline-none focus:border-slate-400 focus:bg-white transition-all font-semibold"
               >
                 {items.map(it => <option key={it.id} value={it.id}>{it.tool_name} - {it.title}</option>)}
               </select>
@@ -167,7 +167,7 @@ export default function ContentCreator({ userId }: ContentCreatorProps) {
               <select
                 value={contentType}
                 onChange={(e) => setContentType(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-slate-400 focus:bg-white transition-all font-semibold"
+                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-base md:text-xs focus:outline-none focus:border-slate-400 focus:bg-white transition-all font-semibold"
               >
                 <option value="LinkedIn Post">LinkedIn Post (Professional & objective)</option>
                 <option value="Instagram / TikTok Script">Short Reel/TikTok Script (Punchy & visual)</option>
@@ -196,7 +196,7 @@ export default function ContentCreator({ userId }: ContentCreatorProps) {
                 </div>
                 <div>
                   <strong className="text-slate-800">My logged reality notes:</strong>{' '}
-                  <span className="italic">"{selectedExp?.notes || 'No active sandbox trial conducted yet. We advise completing tests before publishing.'}"</span>
+                  <span className="italic">"{selectedExp?.notes || 'No small safe test conducted yet. We advise completing tests before publishing.'}"</span>
                 </div>
               </div>
             )}

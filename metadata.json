@@ -1,0 +1,6 @@
+{
+  "name": "AI Learning Vault",
+  "description": "Turn saved AI videos, reels, tutorials, posts, and transcripts into structured knowledge, simple explanations, micro-experiments, and personal learning history.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

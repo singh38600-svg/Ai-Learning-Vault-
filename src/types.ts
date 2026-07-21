@@ -76,6 +76,7 @@ export interface KnowledgeItem {
   suggested_action: string;
   
   status: 'Waiting for review' | 'Test now' | 'Learn later' | 'Save as reference' | 'Compare' | 'Turn into content' | 'Turn into a product idea' | 'Archived';
+  is_demo?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -132,6 +133,7 @@ export interface Experiment {
     creator_claim_accurate: string;
     what_to_test_next: string;
   };
+  is_demo?: boolean;
   created_at: string;
   updated_at: string;
 }

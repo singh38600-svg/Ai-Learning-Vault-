@@ -180,9 +180,9 @@ export default function AddItem({ userId, profile, onAnalysisSuccess }: AddItemP
       
       {/* Title Header */}
       <div>
-        <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Add a Saved Video or Post</h2>
-        <p className="text-slate-500 text-xs mt-1">
-          Paste the copied transcript of any Reels, YouTube video, or article to extract actionable instructions.
+        <h2 className="text-2xl font-bold text-slate-900 tracking-tight font-sans">Add Transcript</h2>
+        <p className="text-slate-500 text-sm mt-1">
+          Paste the copied transcript of any reel, video, or article to get a simple, beginner-friendly explanation.
         </p>
       </div>
 
@@ -342,7 +342,7 @@ export default function AddItem({ userId, profile, onAnalysisSuccess }: AddItemP
             <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-150">
                 <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
-                  💡 <strong>What happens next?</strong> The AI will read your transcript, find the main idea, explain it simply, calculate a compatibility score, and recommend custom no-code experiments.
+                  💡 <strong>What happens next?</strong> The AI will read your transcript, explain it simply, match it to your experience level, and recommend one small action step to test it yourself.
                 </p>
               </div>
 
@@ -357,10 +357,10 @@ export default function AddItem({ userId, profile, onAnalysisSuccess }: AddItemP
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-lg shadow-indigo-100"
+                  className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-lg shadow-indigo-100 animate-none"
                 >
                   <Sparkles className="w-4 h-4" />
-                  <span>Analyse with AI</span>
+                  <span>Get Explanation</span>
                   <ChevronRight className="w-3.5 h-3.5" />
                 </button>
               </div>

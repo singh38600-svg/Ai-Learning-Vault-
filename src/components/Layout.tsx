@@ -43,19 +43,16 @@ export default function Layout({
   const navItems = [
     { id: 'dashboard', label: 'Home', icon: Flame },
     { id: 'add', label: 'Add', icon: PlusCircle },
-    { id: 'inbox', label: 'Inbox', icon: Inbox },
-    { id: 'library', label: 'Library', icon: Library },
-    { id: 'actions', label: 'Actions', icon: Sparkles },
-    { id: 'experiments', label: 'Experiments', icon: FlaskConical },
-    { id: 'ideas', label: 'Ideas', icon: Lightbulb },
-    { id: 'settings', label: 'Settings', icon: Settings },
+    { id: 'library', label: 'Saved Lessons', icon: Library },
+    { id: 'experiments', label: 'Try Next', icon: FlaskConical },
+    { id: 'settings', label: 'Profile', icon: Settings },
   ] as const;
 
   return (
-    <div id="vault-layout" className="min-h-screen bg-[#F8FAFC] flex flex-col sm:flex-row pb-16 sm:pb-0 font-sans text-slate-800">
+    <div id="vault-layout" className="min-h-screen bg-[#F8FAFC] flex flex-col md:flex-row pb-16 md:pb-0 font-sans text-slate-800">
       
       {/* Desktop Sidebar Navigation */}
-      <aside className="hidden sm:flex flex-col w-64 bg-white text-slate-700 border-r border-slate-200 shrink-0 sticky top-0 h-screen">
+      <aside className="hidden md:flex flex-col w-64 bg-white text-slate-700 border-r border-slate-200 shrink-0 sticky top-0 h-screen">
         {/* Brand Header */}
         <div className="p-6 border-b border-slate-200 flex items-center gap-2.5">
           <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold shadow-sm">
@@ -113,12 +110,6 @@ export default function Layout({
                 {isOffline ? 'Local Sandbox' : 'Supabase Live'}
               </p>
             </div>
-            <button
-              onClick={() => setActiveTab('settings')}
-              className="w-full py-1.5 bg-white border border-slate-200 text-slate-600 rounded-lg text-[10px] font-semibold hover:bg-slate-50 transition-colors"
-            >
-              Manage Keys
-            </button>
           </div>
 
           <button
@@ -132,18 +123,15 @@ export default function Layout({
       </aside>
 
       {/* Mobile Sticky Header */}
-      <header className="sm:hidden bg-white border-b border-slate-200 text-slate-800 px-4 py-3 flex items-center justify-between sticky top-0 z-30">
+      <header className="md:hidden bg-white border-b border-slate-200 text-slate-800 px-5 py-3.5 flex items-center justify-between sticky top-0 z-30">
         <div className="flex items-center gap-2">
           <div className="p-1 bg-indigo-50 text-indigo-600 rounded-lg">
             <Flame className="w-4 h-4" />
           </div>
-          <span className="text-xs font-bold tracking-tight text-slate-900">Learning Vault</span>
+          <span className="text-sm font-bold tracking-tight text-slate-900">Learning Vault</span>
         </div>
 
         <div className="flex items-center gap-3">
-          <span className={`text-[9px] font-mono px-2 py-0.5 rounded-full ${isOffline ? 'bg-amber-50 text-amber-700' : 'bg-indigo-50 text-indigo-700'}`}>
-            {isOffline ? 'Sandbox' : 'Live'}
-          </span>
           {profile && (
             <div className="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-700">
               {profile.full_name.charAt(0).toUpperCase()}
@@ -153,7 +141,7 @@ export default function Layout({
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col min-w-0 max-w-7xl mx-auto px-4 py-6 sm:py-8 sm:px-8">
+      <main className="flex-1 flex flex-col min-w-0 max-w-7xl mx-auto px-5 py-5 md:py-8 md:px-8">
         
         {/* Active view rendering */}
         <div className="flex-grow">
@@ -162,7 +150,7 @@ export default function Layout({
       </main>
 
       {/* Mobile Bottom Navigation Rail */}
-      <nav className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-lg px-2 py-2 flex justify-around items-center z-40 select-none">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-lg px-2 py-2.5 flex justify-around items-center z-40 select-none">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -170,12 +158,12 @@ export default function Layout({
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className="flex flex-col items-center justify-center flex-1 py-1 min-h-[44px]"
+              className="flex flex-col items-center justify-center flex-1 py-1 min-h-[48px]"
             >
-              <div className={`p-1 rounded-xl transition-all ${isActive ? 'bg-slate-100 text-indigo-700 px-3' : 'text-slate-500'}`}>
-                <Icon className="w-4.5 h-4.5" />
+              <div className={`p-1.5 rounded-xl transition-all ${isActive ? 'bg-slate-100 text-indigo-700 px-3' : 'text-slate-500'}`}>
+                <Icon className="w-5 h-5" />
               </div>
-              <span className={`text-[9px] font-medium mt-0.5 ${isActive ? 'text-indigo-700 font-bold' : 'text-slate-400'}`}>
+              <span className={`text-[10px] font-medium mt-1 ${isActive ? 'text-indigo-700 font-bold' : 'text-slate-400'}`}>
                 {item.label}
               </span>
             </button>

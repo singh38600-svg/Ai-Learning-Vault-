@@ -255,7 +255,7 @@ export default function Library({
         <div>
           <h2 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
             <LibraryIcon className="w-6 h-6 text-emerald-600" />
-            <span>Knowledge Library ({sortedItems.length})</span>
+            <span>Saved Lessons ({sortedItems.length})</span>
           </h2>
           <p className="text-slate-500 text-xs mt-1">
             Access your entire processed repository. Filter, search with natural language, or trigger a side-by-side comparison.
@@ -460,12 +460,28 @@ export default function Library({
       </AnimatePresence>
 
       {/* Library Grid */}
-      {sortedItems.length === 0 ? (
-        <div className="p-12 text-center bg-white border border-slate-200/80 rounded-3xl space-y-3">
+      {items.length === 0 ? (
+        <div className="p-12 text-center bg-white border border-slate-200 rounded-3xl space-y-4 max-w-md mx-auto shadow-sm">
+          <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto">
+            <PlusCircle className="w-6 h-6" />
+          </div>
+          <h4 className="text-base font-bold text-slate-900">Your Saved Lessons is empty</h4>
+          <p className="text-slate-500 text-sm leading-relaxed font-semibold">
+            There are no lessons saved yet. Paste a transcript from any AI video or article, and the AI will simplify it for you.
+          </p>
+          <button
+            onClick={() => setActiveTab('add')}
+            className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all"
+          >
+            Paste Transcript Now
+          </button>
+        </div>
+      ) : sortedItems.length === 0 ? (
+        <div className="p-12 text-center bg-white border border-slate-200 rounded-3xl space-y-3">
           <AlertCircle className="w-8 h-8 text-slate-400 mx-auto" />
           <h4 className="text-sm font-bold text-slate-800">No matching items found</h4>
           <p className="text-slate-400 text-xs font-semibold max-w-xs mx-auto leading-relaxed">
-            We couldn't locate any saves corresponding to your active filter or search keywords. Tap Reset or clear search terms!
+            We couldn't locate any saves corresponding to your active filters or search keywords. Please clear search terms or reset filters!
           </p>
         </div>
       ) : (

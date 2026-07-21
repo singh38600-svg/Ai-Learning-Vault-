@@ -1,25 +1,10 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import { useEffect, useState } from 'react';
 import { dbService } from '../lib/databaseService';
-import { KnowledgeItem, Experiment, ContentDraft, ProductIdea, Profile } from '../types';
+import { KnowledgeItem, Experiment, Profile } from '../types';
 import {
-  Sparkles,
-  Inbox,
-  Library,
-  FlaskConical,
-  CheckCircle,
-  XCircle,
-  Lightbulb,
-  FileText,
-  Flame,
+  PlusCircle,
   ArrowRight,
-  TrendingUp,
-  Award,
-  PlusCircle
+  Sparkles
 } from 'lucide-react';
 import { motion } from 'motion/react';
 
@@ -33,23 +18,17 @@ interface DashboardProps {
 export default function Dashboard({ userId, setActiveTab, setSelectedItemId, profile }: DashboardProps) {
   const [items, setItems] = useState<KnowledgeItem[]>([]);
   const [exps, setExps] = useState<Experiment[]>([]);
-  const [drafts, setDrafts] = useState<ContentDraft[]>([]);
-  const [ideas, setIdeas] = useState<ProductIdea[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
       try {
-        const [ki, ex, dr, id] = await Promise.all([
+        const [ki, ex] = await Promise.all([
           dbService.getKnowledgeItems(userId),
           dbService.getExperiments(userId),
-          dbService.getContentDrafts(userId),
-          dbService.getProductIdeas(userId),
         ]);
         setItems(ki);
         setExps(ex);
-        setDrafts(dr);
-        setIdeas(id);
       } catch (err) {
         console.error('Failed to load dashboard data:', err);
       } finally {
@@ -62,224 +41,232 @@ export default function Dashboard({ userId, setActiveTab, setSelectedItemId, pro
   if (loading) {
     return (
       <div className="flex flex-col justify-center items-center h-[50vh] space-y-3">
-        <div className="w-8 h-8 border-4 border-slate-900 border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-slate-500 text-xs">Assembling your learning metrics...</p>
+        <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-slate-500 text-sm font-medium">Assembling your progress...</p>
       </div>
     );
   }
 
-  // Calculate statistics
   const totalSaved = items.length;
-  const waitingReview = items.filter(x => x.status === 'Waiting for review').length;
-  const readyToTest = items.filter(x => x.status === 'Test now').length;
-  const activeExps = exps.filter(x => x.status === 'Active').length;
-  const completedExps = exps.filter(x => x.status === 'Completed' || x.status === 'Adopted' || x.status === 'Rejected').length;
-  const adoptedTools = exps.filter(x => x.status === 'Adopted' || x.final_decision === 'Adopted').length;
-  const rejectedTools = exps.filter(x => x.status === 'Rejected' || x.final_decision === 'Rejected').length;
-  const contentDraftsCreated = drafts.length;
-  const productIdeasCreated = ideas.length;
+  // Tried is completed, active or adopted experiments
+  const totalTried = exps.filter(x => x.status !== 'Planned').length;
+  // Useful is adopted/approved experiments
+  const totalUseful = exps.filter(x => x.status === 'Adopted' || x.final_decision === 'Adopted').length;
 
-  // Encouragement Message
-  const testedCount = completedExps + activeExps;
-  const progressMessage = totalSaved > 0
-    ? `You saved ${totalSaved} useful ideas and tested ${testedCount}. Let's choose one small thing to try today!`
-    : "Your vault is empty! Let's copy a transcript from a viral AI video or post and see what you can test today!";
+  const progressSentence = totalSaved > 0
+    ? `You have saved ${totalSaved} lessons and tried ${totalTried} small actions. Keep it up!`
+    : "Your vault is empty. Paste a transcript to get your first simplified explanation!";
 
-  // Generate dynamic recommended actions (max 3)
-  const recommendedActions: Array<{
-    id: string;
-    title: string;
-    description: string;
-    actionLabel: string;
-    tab: 'dashboard' | 'add' | 'inbox' | 'library' | 'actions' | 'experiments' | 'ideas' | 'settings';
-    itemId?: string;
-  }> = [];
+  // Up to three recent lessons
+  const recentLessons = [...items]
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 3);
 
-  // Action 1: Review items waiting in Inbox
-  if (waitingReview > 0) {
-    recommendedActions.push({
-      id: 'review-inbox',
-      title: 'Review Inbox Items',
-      description: `You have ${waitingReview} saved transcripts waiting for your analysis review. Let's see which are relevant!`,
-      actionLabel: 'Go to Inbox',
-      tab: 'inbox'
-    });
+  // Single recommended next action
+  let recommendedAction = {
+    title: "Add your first lesson",
+    description: "Paste a transcript from any AI video, reel, or article to extract clear, beginner-friendly steps.",
+    buttonText: "Paste Transcript",
+    onClick: () => setActiveTab('add')
+  };
+
+  if (totalSaved > 0) {
+    const pendingExp = exps.find(x => x.status === 'Planned');
+    const runningExp = exps.find(x => x.status === 'Active');
+    
+    if (runningExp) {
+      recommendedAction = {
+        title: `Finish testing: ${runningExp.title}`,
+        description: `You are currently trying this tool. Record what happened to finish your test and save your learnings!`,
+        buttonText: "Record What Happened",
+        onClick: () => setActiveTab('experiments')
+      };
+    } else if (pendingExp) {
+      recommendedAction = {
+        title: `Try this next: ${pendingExp.title}`,
+        description: `Take one small action today: ${pendingExp.objective || 'Investigate this tool'}. It only takes about 10-15 minutes!`,
+        buttonText: "Start Simple Test",
+        onClick: () => setActiveTab('experiments')
+      };
+    } else {
+      // Find a saved item without any experiments
+      const itemWithNoExp = items.find(item => !exps.some(e => e.knowledge_item_id === item.id));
+      if (itemWithNoExp) {
+        recommendedAction = {
+          title: `Set up a test for "${itemWithNoExp.title}"`,
+          description: `You saved this lesson. Choose one small action from it and try it out to see if it's actually useful!`,
+          buttonText: "Choose an Action",
+          onClick: () => {
+            setSelectedItemId(itemWithNoExp.id);
+            setActiveTab('library');
+          }
+        };
+      } else {
+        recommendedAction = {
+          title: "Find another lesson to save",
+          description: "Paste another video or article transcript to learn another no-code trick.",
+          buttonText: "Add Transcript",
+          onClick: () => setActiveTab('add')
+        };
+      }
+    }
   }
-
-  // Action 2: Trigger a planned experiment
-  const pendingExp = exps.find(x => x.status === 'Planned');
-  if (pendingExp && recommendedActions.length < 3) {
-    recommendedActions.push({
-      id: 'start-experiment',
-      title: 'Launch a Micro-Test',
-      description: `Ready to test "${pendingExp.title}"? It only takes about ${pendingExp.estimated_time || '15 mins'} of no-code investigation.`,
-      actionLabel: 'Open Experiments',
-      tab: 'experiments'
-    });
-  }
-
-  // Action 3: Turn an adopted tool into a SaaS idea or Content Draft
-  const adoptedExp = exps.find(x => x.status === 'Adopted' || x.final_decision === 'Adopted');
-  if (adoptedExp && recommendedActions.length < 3) {
-    recommendedActions.push({
-      id: 'create-product-idea',
-      title: 'Formulate a Product Idea',
-      description: `You successfully adopted "${adoptedExp.title}"! Let's translate this verified expertise into a small business idea.`,
-      actionLabel: 'Generate Product Idea',
-      tab: 'ideas'
-    });
-  }
-
-  // Fallbacks if not enough context
-  if (recommendedActions.length < 3) {
-    recommendedActions.push({
-      id: 'add-item',
-      title: 'Add an AI Reel or Article',
-      description: 'Found a helpful tip on Instagram, YouTube, or Medium? Paste its transcript here to extract clean steps.',
-      actionLabel: 'Add New Content',
-      tab: 'add'
-    });
-  }
-  if (recommendedActions.length < 3) {
-    recommendedActions.push({
-      id: 'try-compare',
-      title: 'Compare Tools',
-      description: 'Select two saved tools from your library to examine their differences, pricing, and limitations side-by-side.',
-      actionLabel: 'Open Library to Compare',
-      tab: 'library'
-    });
-  }
-
-  const statCards = [
-    { label: 'Total Saved', value: totalSaved, icon: Library, color: 'bg-indigo-50 text-indigo-600' },
-    { label: 'Review Pending', value: waitingReview, icon: Inbox, color: 'bg-amber-50 text-amber-600' },
-    { label: 'Ready to Test', value: readyToTest, icon: Sparkles, color: 'bg-emerald-50 text-emerald-600' },
-    { label: 'Active Tests', value: activeExps, icon: FlaskConical, color: 'bg-pink-50 text-pink-600 animate-pulse' },
-    { label: 'Tests Completed', value: completedExps, icon: CheckCircle, color: 'bg-teal-50 text-teal-600' },
-    { label: 'Tools Adopted', value: adoptedTools, icon: Award, color: 'bg-purple-50 text-purple-600' },
-    { label: 'Tools Rejected', value: rejectedTools, icon: XCircle, color: 'bg-rose-50 text-rose-600' },
-    { label: 'Product Ideas', value: productIdeasCreated, icon: Lightbulb, color: 'bg-sky-50 text-sky-600' },
-    { label: 'Content Drafts', value: contentDraftsCreated, icon: FileText, color: 'bg-slate-50 text-slate-600' },
-  ];
 
   return (
-    <div id="dashboard-view" className="space-y-8">
-      
-      {/* Clean Minimalism Top Header */}
-      <motion.header
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 pb-2"
-      >
-        <div className="space-y-2">
-          <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest font-mono">Workspace Overview</span>
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">
-            Hello, {profile.full_name}! 👋
-          </h2>
-          <p className="text-slate-500 max-w-xl leading-relaxed text-sm font-medium">
-            {progressMessage}
-          </p>
-        </div>
-        
-        <div className="shrink-0">
-          <button
-            onClick={() => setActiveTab('add')}
-            className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700 hover:shadow-indigo-200 transition-all flex items-center gap-2 text-xs sm:text-sm"
-          >
-            <PlusCircle className="w-4 h-4" />
-            <span>Analyse Video</span>
-          </button>
-        </div>
-      </motion.header>
-
-      {/* Recommended Next Actions */}
-      <div className="space-y-4">
-        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-indigo-600" />
-          <span>Recommended Actions (Max 3)</span>
-        </h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {recommendedActions.map((action, index) => (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              key={action.id}
-              className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm hover:border-indigo-200 transition-colors flex flex-col justify-between group"
-            >
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="px-3 py-1 bg-indigo-50 text-indigo-700 text-[10px] font-bold rounded-full uppercase tracking-wider">Action 0{index + 1}</span>
-                  <span className="text-slate-400 text-xs font-medium">⏱ Active</span>
-                </div>
-                <h4 className="text-base font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">{action.title}</h4>
-                <p className="text-xs text-slate-500 leading-relaxed font-medium">{action.description}</p>
-              </div>
-              
-              <button
-                onClick={() => {
-                  if (action.itemId) setSelectedItemId(action.itemId);
-                  setActiveTab(action.tab);
-                }}
-                className="mt-6 w-full py-3 bg-slate-900 text-white hover:bg-black rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-sm"
-              >
-                <span>{action.actionLabel}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </motion.div>
-          ))}
-        </div>
+    <div className="space-y-6 md:space-y-8">
+      {/* Friendly Greeting Header */}
+      <div className="space-y-2">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">
+          Hello, {profile.full_name}! 👋
+        </h2>
+        <p className="text-slate-600 text-base md:text-lg font-medium leading-relaxed">
+          {progressSentence}
+        </p>
       </div>
 
-      {/* Bento Stats Grid */}
-      <div className="space-y-4">
-        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Vault Metrics</h3>
-        
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-9 gap-4">
-          {statCards.map((stat, index) => {
-            const Icon = stat.icon;
-            // Introduce subtle border-l styles to some cards for rhythm/variation as in Clean Minimalism
-            const isFeatured = index === 0 || index === 2 || index === 5;
-            return (
-              <div
-                key={stat.label}
-                className={`bg-white p-5 rounded-3xl border border-slate-100 flex flex-col justify-between shadow-sm transition-transform hover:-translate-y-0.5 duration-200 ${
-                  isFeatured ? 'border-l-4 border-l-indigo-500' : ''
-                }`}
-              >
-                <div className="flex items-start justify-between gap-1">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-tight">{stat.label}</span>
-                  <div className="p-1 text-slate-400 shrink-0">
-                    <Icon className="w-4 h-4" />
-                  </div>
-                </div>
-                <div className="mt-4 text-2xl font-bold text-slate-900 leading-none">{stat.value}</div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Onboarding goals reminder card */}
-      <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="space-y-1">
-          <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-            <Award className="w-4 h-4 text-indigo-600" />
-            <span>Target Learning Synergy</span>
-          </h4>
-          <p className="text-xs text-slate-500 leading-relaxed font-medium">
-            You set your experience level as <strong className="font-bold text-slate-900">{profile.experience_level}</strong> with active interest in <strong className="font-bold text-slate-900">{profile.interests.join(', ')}</strong>. Matching entries are highlighted automatically.
-          </p>
-        </div>
+      {/* Primary Call to Action Button */}
+      <div className="pt-2">
         <button
-          onClick={() => setActiveTab('settings')}
-          className="shrink-0 px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold transition-colors shadow-sm"
+          onClick={() => setActiveTab('add')}
+          className="w-full sm:w-auto bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold text-base shadow-lg shadow-indigo-100 hover:bg-indigo-700 hover:shadow-indigo-200 transition-all flex items-center justify-center gap-2.5"
         >
-          Adjust Experience Goals
+          <PlusCircle className="w-5 h-5" />
+          <span>{totalSaved > 0 ? "Add Transcript" : "Add My First Transcript"}</span>
         </button>
       </div>
 
+      {/* Progress Counts (Saved, Tried, Useful) */}
+      <div className="space-y-3">
+        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest font-mono">
+          Your Progress
+        </h3>
+        <div className="grid grid-cols-3 gap-3">
+          <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Saved</span>
+            <div className="mt-2 flex items-baseline gap-1">
+              <span className="text-xl sm:text-2xl font-bold text-slate-900">{totalSaved}</span>
+              <span className="text-[10px] text-slate-500 font-medium">lessons</span>
+            </div>
+          </div>
+          <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tried</span>
+            <div className="mt-2 flex items-baseline gap-1">
+              <span className="text-xl sm:text-2xl font-bold text-slate-900">{totalTried}</span>
+              <span className="text-[10px] text-slate-500 font-medium font-mono">times</span>
+            </div>
+          </div>
+          <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Useful</span>
+            <div className="mt-2 flex items-baseline gap-1">
+              <span className="text-xl sm:text-2xl font-bold text-emerald-600">{totalUseful}</span>
+              <span className="text-[10px] text-slate-500 font-medium font-mono">tools</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Empty State Instruction or Recommended Action */}
+      {totalSaved === 0 ? (
+        <div className="bg-indigo-50/50 rounded-3xl border border-indigo-100 p-6 space-y-4">
+          <div className="flex items-start gap-3">
+            <div className="p-2 bg-indigo-100 text-indigo-700 rounded-xl shrink-0">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-indigo-900">How to use your Learning Vault</h4>
+              <p className="text-xs text-indigo-700/90 leading-relaxed mt-1 font-medium">
+                This is where you paste transcripts from viral AI reels, posts, or articles to get beginner-friendly, jargon-free explanations. 
+                Our AI will break down what the tool does, who it's for, and give you one small action step to test it yourself.
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* Recommended Action (What to Try Next) */
+        <div className="space-y-3">
+          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest font-mono">
+            What to Try Next
+          </h3>
+          <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4">
+            <div className="space-y-1">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-indigo-50 text-indigo-700 text-[10px] font-bold rounded-md uppercase tracking-wide font-mono">
+                Suggested
+              </span>
+              <h4 className="text-base font-bold text-slate-900">{recommendedAction.title}</h4>
+              <p className="text-sm text-slate-500 leading-relaxed font-medium">
+                {recommendedAction.description}
+              </p>
+            </div>
+            <button
+              onClick={recommendedAction.onClick}
+              className="w-full sm:w-auto px-5 py-2.5 bg-slate-950 hover:bg-black text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors"
+            >
+              <span>{recommendedAction.buttonText}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Up to Three Recently Saved Lessons */}
+      {totalSaved > 0 && (
+        <div className="space-y-3">
+          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest font-mono">
+            Recently Saved Lessons
+          </h3>
+          <div className="space-y-3">
+            {recentLessons.map((item) => (
+              <div
+                key={item.id}
+                onClick={() => {
+                  setSelectedItemId(item.id);
+                  setActiveTab('library');
+                }}
+                className="p-4 bg-white rounded-2xl border border-slate-100 hover:border-indigo-200 shadow-sm transition-colors cursor-pointer flex flex-col justify-between gap-3 group"
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono truncate">
+                      {item.tool_name || 'General Lesson'}
+                    </span>
+                    {item.is_demo && (
+                      <span className="text-[9px] bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded-md font-bold font-mono border border-amber-100">
+                        Demo
+                      </span>
+                    )}
+                  </div>
+                  <h4 className="text-base font-bold text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">
+                    {item.title}
+                  </h4>
+                  <p className="text-xs text-slate-500 leading-relaxed line-clamp-2 font-medium">
+                    {item.one_sentence_explanation}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1 text-xs font-bold text-indigo-600">
+                  <span>View Details</span>
+                  <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* What you are learning Goals */}
+      <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
+        <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider font-mono">
+          What You Are Learning
+        </h4>
+        <p className="text-xs text-slate-500 leading-relaxed font-medium">
+          You are exploring tools with a <strong className="font-bold text-slate-800">{profile.experience_level}</strong> skill level on <strong className="font-bold text-slate-800">{profile.main_device}</strong>. Focused on <strong className="font-bold text-slate-800">{profile.interests.join(', ')}</strong>.
+        </p>
+        <button
+          onClick={() => setActiveTab('settings')}
+          className="text-xs font-bold text-indigo-600 hover:text-indigo-700 pt-1"
+        >
+          Change Preferences →
+        </button>
+      </div>
     </div>
   );
 }

@@ -43,7 +43,7 @@ const SEED_PROFILE: Profile = {
   current_projects: 'A simple recruitment automated helper, personal notes organizer.',
   preferred_explanation_style: 'Explain like I am five',
   weekly_learning_time: 4,
-  onboarding_completed: true,
+  onboarding_completed: false,
   created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
   updated_at: new Date().toISOString(),
 };
@@ -618,15 +618,15 @@ class DatabaseService {
     }
     // Knowledge items
     if (!localStorage.getItem(KEYS.KNOWLEDGE_ITEMS)) {
-      localStorage.setItem(KEYS.KNOWLEDGE_ITEMS, JSON.stringify(SEED_KNOWLEDGE_ITEMS));
+      localStorage.setItem(KEYS.KNOWLEDGE_ITEMS, JSON.stringify([]));
     }
     // Relations
     if (!localStorage.getItem(KEYS.KNOWLEDGE_RELATIONS)) {
-      localStorage.setItem(KEYS.KNOWLEDGE_RELATIONS, JSON.stringify(SEED_RELATIONS));
+      localStorage.setItem(KEYS.KNOWLEDGE_RELATIONS, JSON.stringify([]));
     }
     // Experiments
     if (!localStorage.getItem(KEYS.EXPERIMENTS)) {
-      localStorage.setItem(KEYS.EXPERIMENTS, JSON.stringify(SEED_EXPERIMENTS));
+      localStorage.setItem(KEYS.EXPERIMENTS, JSON.stringify([]));
     }
     // Attachments
     if (!localStorage.getItem(KEYS.ATTACHMENTS)) {
@@ -634,15 +634,63 @@ class DatabaseService {
     }
     // Content drafts
     if (!localStorage.getItem(KEYS.CONTENT_DRAFTS)) {
-      localStorage.setItem(KEYS.CONTENT_DRAFTS, JSON.stringify(SEED_DRAFTS));
+      localStorage.setItem(KEYS.CONTENT_DRAFTS, JSON.stringify([]));
     }
     // Product ideas
     if (!localStorage.getItem(KEYS.PRODUCT_IDEAS)) {
-      localStorage.setItem(KEYS.PRODUCT_IDEAS, JSON.stringify(SEED_PRODUCT_IDEAS));
+      localStorage.setItem(KEYS.PRODUCT_IDEAS, JSON.stringify([]));
     }
     // Weekly reviews
     if (!localStorage.getItem(KEYS.WEEKLY_REVIEWS)) {
+      localStorage.setItem(KEYS.WEEKLY_REVIEWS, JSON.stringify([]));
+    }
+  }
+
+  async seedSampleData(userId: string): Promise<void> {
+    const demoItems = SEED_KNOWLEDGE_ITEMS.map(item => ({
+      ...item,
+      user_id: userId,
+      title: item.title.startsWith('Demo: ') ? item.title : `Demo: ${item.title}`,
+      is_demo: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }));
+    
+    const demoExps = SEED_EXPERIMENTS.map(exp => ({
+      ...exp,
+      user_id: userId,
+      title: exp.title.startsWith('Demo: ') ? exp.title : `Demo: ${exp.title}`,
+      is_demo: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }));
+
+    if (this.isLocal) {
+      localStorage.setItem(KEYS.KNOWLEDGE_ITEMS, JSON.stringify(demoItems));
+      localStorage.setItem(KEYS.EXPERIMENTS, JSON.stringify(demoExps));
       localStorage.setItem(KEYS.WEEKLY_REVIEWS, JSON.stringify([SEED_WEEKLY_REVIEW]));
+      localStorage.setItem(KEYS.PRODUCT_IDEAS, JSON.stringify(SEED_PRODUCT_IDEAS));
+      localStorage.setItem(KEYS.CONTENT_DRAFTS, JSON.stringify(SEED_DRAFTS));
+      localStorage.setItem(KEYS.KNOWLEDGE_RELATIONS, JSON.stringify(SEED_RELATIONS));
+    }
+  }
+
+  async clearSampleData(userId: string): Promise<void> {
+    if (this.isLocal) {
+      const items = localStorage.getItem(KEYS.KNOWLEDGE_ITEMS);
+      const parsedItems = items ? JSON.parse(items) : [];
+      const nonDemoItems = parsedItems.filter((x: any) => !x.is_demo && !x.title?.includes('Demo:'));
+      localStorage.setItem(KEYS.KNOWLEDGE_ITEMS, JSON.stringify(nonDemoItems));
+
+      const exps = localStorage.getItem(KEYS.EXPERIMENTS);
+      const parsedExps = exps ? JSON.parse(exps) : [];
+      const nonDemoExps = parsedExps.filter((x: any) => !x.is_demo && !x.title?.includes('Demo:'));
+      localStorage.setItem(KEYS.EXPERIMENTS, JSON.stringify(nonDemoExps));
+
+      localStorage.setItem(KEYS.WEEKLY_REVIEWS, JSON.stringify([]));
+      localStorage.setItem(KEYS.PRODUCT_IDEAS, JSON.stringify([]));
+      localStorage.setItem(KEYS.CONTENT_DRAFTS, JSON.stringify([]));
+      localStorage.setItem(KEYS.KNOWLEDGE_RELATIONS, JSON.stringify([]));
     }
   }
 

@@ -122,11 +122,11 @@ export default function Inbox({ userId, onDecisionComplete, setSelectedItemId, s
       {/* Header Info */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+          <h2 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2 font-sans">
             <InboxIcon className="w-6 h-6 text-emerald-600" />
-            <span>Review Inbox ({items.length})</span>
+            <span>Review explanation ({items.length})</span>
           </h2>
-          <p className="text-slate-500 text-xs mt-1">
+          <p className="text-slate-500 text-sm mt-1">
             Items enter here after AI transcript processing. Select your preferred next action to turn watching into doing!
           </p>
         </div>

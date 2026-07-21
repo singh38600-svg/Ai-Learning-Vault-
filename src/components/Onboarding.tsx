@@ -28,6 +28,7 @@ export default function Onboarding({ userId, onOnboardingComplete }: OnboardingP
   const [currentProjects, setCurrentProjects] = useState('');
   const [weeklyLearningTime, setWeeklyLearningTime] = useState(3);
   const [preferredStyle, setPreferredStyle] = useState<Profile['preferred_explanation_style']>('Explain like I am five');
+  const [vaultStartType, setVaultStartType] = useState<'empty' | 'demo'>('empty');
 
   const topics = [
     'AI tools', 'AI agents', 'Automation', 'Content creation', 'Research',
@@ -61,6 +62,13 @@ export default function Onboarding({ userId, onOnboardingComplete }: OnboardingP
       };
 
       const completed = await dbService.updateProfile(initialProfile);
+      
+      if (vaultStartType === 'demo') {
+        await dbService.seedSampleData(userId);
+      } else {
+        await dbService.clearSampleData(userId);
+      }
+
       onOnboardingComplete(completed);
     } catch (error) {
       console.error('Onboarding failed:', error);
@@ -122,6 +130,43 @@ export default function Onboarding({ userId, onOnboardingComplete }: OnboardingP
                       placeholder="e.g. Rohini Singh"
                       className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-slate-400 focus:bg-white transition-all"
                     />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">How would you like to start?</label>
+                    <div className="grid grid-cols-1 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setVaultStartType('empty')}
+                        className={`p-3 text-xs border rounded-xl font-medium transition-all text-left flex flex-col justify-center ${
+                          vaultStartType === 'empty'
+                            ? 'border-slate-900 bg-slate-900 text-white shadow-sm'
+                            : 'border-slate-200 bg-white hover:border-slate-300 text-slate-600'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <span className="font-bold">Start with an empty vault (Recommended)</span>
+                          {vaultStartType === 'empty' && <Check className="w-3.5 h-3.5 text-emerald-400" />}
+                        </div>
+                        <p className="text-[10px] opacity-80 mt-0.5">Start with a clean slate for your own real personal lessons.</p>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setVaultStartType('demo')}
+                        className={`p-3 text-xs border rounded-xl font-medium transition-all text-left flex flex-col justify-center ${
+                          vaultStartType === 'demo'
+                            ? 'border-slate-900 bg-slate-900 text-white shadow-sm'
+                            : 'border-slate-200 bg-white hover:border-slate-300 text-slate-600'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <span className="font-bold">Explore with sample data</span>
+                          {vaultStartType === 'demo' && <Check className="w-3.5 h-3.5 text-emerald-400" />}
+                        </div>
+                        <p className="text-[10px] opacity-80 mt-0.5">Pre-fill with marked demo lessons and experiments to test out features.</p>
+                      </button>
+                    </div>
                   </div>
 
                   <div>

@@ -84,25 +84,33 @@ export default function ProfileSettings({ userId, profile, onProfileUpdate }: Pr
     }
   };
 
+  const handleRemoveDemoData = async () => {
+    if (confirm('🧹 Are you sure you want to remove all demo records? This will delete all sample/demo lessons and experiments, leaving only your personal saves.')) {
+      await dbService.clearSampleData(userId);
+      alert('All demo records have been successfully cleared!');
+      window.location.reload();
+    }
+  };
+
   return (
     <div id="profile-settings-block" className="space-y-6">
       
       {/* Title */}
       <div>
-        <h3 className="text-sm font-bold text-slate-800 uppercase font-mono tracking-wider flex items-center gap-1.5">
-          <User className="w-4 h-4 text-emerald-600" />
-          <span>My Learning Profile Settings</span>
+        <h3 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-1.5 font-sans">
+          <User className="w-5 h-5 text-indigo-600" />
+          <span>My Profile</span>
         </h3>
-        <p className="text-slate-500 text-xs mt-1">
-          Adjust your educational variables. AI Learning Vault utilizes these fields to calculate customized match grades and formulate sandbox testing suggestions.
+        <p className="text-slate-500 text-sm mt-1 leading-relaxed">
+          Adjust your learning goals and preferences. The AI uses these settings to simplify explanations for your level.
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
         {/* Core Profile parameters */}
-        <form onSubmit={handleSave} className="md:col-span-2 bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-4">
-          <span className="text-[9px] font-bold text-slate-400 font-mono uppercase tracking-widest block">Update Learning Parameters</span>
+        <form onSubmit={handleSave} className="md:col-span-2 bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+          <span className="text-[10px] font-bold text-slate-400 font-mono uppercase tracking-widest block">Update Learning Parameters</span>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
@@ -204,27 +212,47 @@ export default function ProfileSettings({ userId, profile, onProfileUpdate }: Pr
         </form>
 
         {/* Database reset block */}
-        <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm flex flex-col justify-between space-y-4">
+        <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
           <div className="space-y-3">
             <span className="text-[9px] font-bold text-slate-400 font-mono uppercase tracking-widest block">System Diagnostics</span>
             
+            <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+              <h5 className="text-[11px] font-bold text-slate-800 flex items-center gap-1">
+                🧹 Clear Demo Data
+              </h5>
+              <p className="text-[10px] text-slate-500 font-semibold leading-relaxed">
+                Removes all pre-seeded sample/demo lessons and test experiments from your lists, leaving only your personal saves.
+              </p>
+            </div>
+
             <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl space-y-1">
               <h5 className="text-[11px] font-bold text-rose-800 flex items-center gap-1">
-                <RotateCcw className="w-3.5 h-3.5 text-rose-600" /> Reset Database
+                <RotateCcw className="w-3.5 h-3.5 text-rose-600" /> Factory Reset
               </h5>
               <p className="text-[10px] text-rose-600 font-semibold leading-relaxed">
-                Clearing local storage deletes all custom logs, notes, drafts, and resets original seed data. Recommended when testing multiple scenarios!
+                Clears all data from local storage, deletes all custom records, and restores the original pre-seeded lessons.
               </p>
             </div>
           </div>
 
-          <button
-            onClick={handleResetDatabase}
-            className="w-full py-2.5 border border-rose-200 hover:bg-rose-50 hover:text-rose-700 rounded-xl text-xs font-bold text-rose-600 transition-colors flex items-center justify-center gap-1.5"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span>Factory Reset Database</span>
-          </button>
+          <div className="space-y-2">
+            <button
+              onClick={handleRemoveDemoData}
+              type="button"
+              className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1.5 min-h-[44px]"
+            >
+              <span>Remove all demo data</span>
+            </button>
+
+            <button
+              onClick={handleResetDatabase}
+              type="button"
+              className="w-full py-2.5 border border-rose-200 hover:bg-rose-50 hover:text-rose-700 rounded-xl text-xs font-bold text-rose-600 transition-colors flex items-center justify-center gap-1.5 min-h-[44px]"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Factory Reset Database</span>
+            </button>
+          </div>
         </div>
 
       </div>
